@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="DAVDK:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>DAVDK</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="DAVDK-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="DAVDK:war exploded" />
+    </root>
+  </artifact>
+</component>
