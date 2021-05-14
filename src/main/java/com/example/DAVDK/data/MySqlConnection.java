@@ -1,4 +1,4 @@
-package com.example.DAVDK;
+package com.example.DAVDK.data;
 
 
 import com.example.DAVDK.utils.Constants;
