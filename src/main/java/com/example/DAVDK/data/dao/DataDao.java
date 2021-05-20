@@ -5,7 +5,6 @@ import com.example.DAVDK.models.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class DataDao extends BaseDao {
     public List<Data> getData() {

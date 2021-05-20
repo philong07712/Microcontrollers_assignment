@@ -22,7 +22,7 @@ public class MySqlConnection {
         String username = Constants.database.USERNAME;
         String password = Constants.database.PASSWORD;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(url, username, password);
             return connection;
         } catch (Exception e) {
