@@ -26,6 +26,7 @@ public class MySqlConnection {
             connection = DriverManager.getConnection(url, username, password);
             return connection;
         } catch (Exception e) {
+            System.out.println("----------------Error of connection is: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
