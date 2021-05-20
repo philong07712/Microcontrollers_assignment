@@ -1,10 +1,7 @@
 package com.example.DAVDK.data;
-
-
 import com.example.DAVDK.utils.Constants;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
 public class MySqlConnection {
     private static MySqlConnection instance;
@@ -22,11 +19,11 @@ public class MySqlConnection {
         String username = Constants.database.USERNAME;
         String password = Constants.database.PASSWORD;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(url, username, password);
             return connection;
         } catch (Exception e) {
-            System.out.println("----------------Error of connection is: " + e.getMessage());
+            System.out.println("---------------------Error is: " + e.getCause());
             e.printStackTrace();
         }
         return null;
