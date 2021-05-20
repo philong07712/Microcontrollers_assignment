@@ -2,12 +2,9 @@ package com.example.DAVDK.utils;
 
 public class Constants {
     public static interface database {
-        String URL = "jdbc:mysql://us-cdbr-east-03.cleardb.com/heroku_1a73f0b826020d1?reconnect=true&characterEncoding=utf8";
-        String USERNAME = "b8e291ef13fa7b";
-        String PASSWORD = "f704e4bf";
-//        String URL = "jdbc:mysql://us-cdbr-east-03.cleardb.com/heroku_b078670462eab24?reconnect=true&characterEncoding=utf8";
-//        String USERNAME = "b682757775bfd9";
-//        String PASSWORD = "31d29d1d";
+        String URL = "jdbc:mysql://us-cdbr-east-03.cleardb.com/heroku_b078670462eab24?reconnect=true&characterEncoding=utf8";
+        String USERNAME = "b682757775bfd9";
+        String PASSWORD = "31d29d1d";
         String SCHEMA_NAME = "heroku_b078670462eab24";
     }
 
