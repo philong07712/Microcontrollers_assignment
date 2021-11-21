@@ -5,9 +5,13 @@
     <title>JSP - Hello World</title>
 </head>
 <body>
-<h1><%= "Hello World!" %>
-</h1>
-<br/>
-<a href="hello-servlet">Hello Servlet</a>
+<form action="hello-servlet" method="get">
+    <label for="fname">So 1:</label><br>
+    <input type="text" id="fname" name="num1"><br>
+    <label for="lname">So 2:</label><br>
+    <input type="text" id="lname" name="num2">
+    <button type="submit" name="your_name" value="Send" class="btn-link">Go</button>
+</form>
+<a href="hello-servlet?num1=3&num2=4">Send</a>
 </body>
 </html>

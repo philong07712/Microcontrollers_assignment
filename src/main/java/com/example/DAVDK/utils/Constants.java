@@ -1,6 +1,14 @@
 package com.example.DAVDK.utils;
 
 public class Constants {
+    public static interface  chess {
+        String BLACK = "Black";
+        String RED = "Red";
+        String START = "Start";
+        String CONNECT = "Connect";
+        String DISCONNECT = "Disconnect";
+    }
+
     public static interface database {
         String URL = "jdbc:mysql://us-cdbr-east-03.cleardb.com/heroku_b078670462eab24?reconnect=true&characterEncoding=utf8";
         String USERNAME = "b682757775bfd9";
