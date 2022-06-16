@@ -63,8 +63,8 @@ public class SheetService {
                 .build();
     }
 
-    public void updateData(Sheets service, String spreadsheetId, String range, String id, Map<String, String> logData)
-            throws Exception {
+    public void updateData(Sheets service, String spreadsheetId, String range, String id,
+                           Map<String, String> logData) throws Exception {
 
         List<List<Object>> values = new ArrayList<>();
         for (Map.Entry<String, String> entry : logData.entrySet()) {
@@ -76,7 +76,6 @@ public class SheetService {
         data.add(new ValueRange()
                 .setRange(range)
                 .setValues(values));
-// Additional ranges to update ...
 
         BatchUpdateValuesRequest body = new BatchUpdateValuesRequest()
                 .setValueInputOption("RAW")
@@ -109,7 +108,6 @@ public class SheetService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private Map<String, String> convertStringToMap(String text) {

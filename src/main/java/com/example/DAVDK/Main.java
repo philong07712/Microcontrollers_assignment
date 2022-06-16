@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 
 public class Main {
@@ -16,8 +17,6 @@ public class Main {
     // v: vua
     // c: phao
     // p: tot
-
-    // TODO: lay cai nay tu chinese chess unity
 
     public static char[][] board =
             {{'x','m','t','s','v','s','t','m','x'},
@@ -51,12 +50,10 @@ public class Main {
                 _board[m.newPoint.y][m.newPoint.x] = _board[m.oldPoint.y][m.oldPoint.x];
                 _board[m.oldPoint.y][m.oldPoint.x] = '_';
                 now = userTurn;
-                System.out.println(m);
             } else {
-                Movement m = CPUMiniMaxTurn(_board, userTurn, depth - 1);
+                Movement m = CPURandomTurn(_board, userTurn);
                 _board[m.newPoint.y][m.newPoint.x] = _board[m.oldPoint.y][m.oldPoint.x];
                 _board[m.oldPoint.y][m.oldPoint.x] = '_';
-                System.out.println(m);
                 now = cpuTurn;
             }
         }
@@ -75,7 +72,7 @@ public class Main {
         return list.get(choice);
     }
 
-    private static void printBoard(char[][] board) {
+    public static void printBoard(char[][] board) {
         for (char[] row : board) {
             for (char c : row) {
                 System.out.print(c + " ");
@@ -110,12 +107,12 @@ public class Main {
     public static Movement CPUMiniMaxTurn(char[][] board, boolean isLower, int depth) {
         List<Movement> list = canGoList(board, isLower);
         Movement ans = new Movement(0, 0, 0, 0);
-        int max = -1000;
+        int max = -Integer.MAX_VALUE;
         for (Movement m : list) {
             char[][] child = cloneBoard(board);
             child[m.newPoint.y][m.newPoint.x] = child[m.oldPoint.y][m.oldPoint.x];
             child[m.oldPoint.y][m.oldPoint.x] = '_';
-            int value = minimax(child, depth - 1, isLower, !isLower);
+            int value = minimax(child, depth - 1, isLower, !isLower, -Integer.MAX_VALUE, +Integer.MAX_VALUE);
             if ((max < value) || (max == value && rand.nextInt(2) == 0)) {
                 max = value;
                 ans = m.clone();
@@ -124,26 +121,31 @@ public class Main {
         return ans;
     }
 
-    private static int minimax(char[][] node, int depth, boolean pMax, boolean pNow) {
+    private static int minimax(char[][] node, int depth, boolean pMax, boolean pNow, int alpha, int beta) {
         if (isFinish(node) || depth == 0) {
             return value(node, pMax);
         }
+
         if (pMax == pNow) {
-            int _max = -1000;
+            int _max = -Integer.MAX_VALUE;
             for (Movement m : canGoList(node, pNow)) {
                 char[][] child = cloneBoard(node);
                 child[m.newPoint.y][m.newPoint.x] = child[m.oldPoint.y][m.oldPoint.x];
                 child[m.oldPoint.y][m.oldPoint.x] = '_';
-                _max = max(_max, minimax(child, depth - 1, pMax, !pNow));
+                _max = max(_max, minimax(child, depth - 1, pMax, !pNow, alpha, beta));
+                alpha = max(alpha, _max);
+                if (beta <= alpha) break;
             }
             return _max;
         } else {
-            int _min = 1000;
+            int _min = Integer.MAX_VALUE;
             for (Movement m : canGoList(node, pNow)) {
                 char[][] child = cloneBoard(node);
                 child[m.newPoint.y][m.newPoint.x] = child[m.oldPoint.y][m.oldPoint.x];
                 child[m.oldPoint.y][m.oldPoint.x] = '_';
-                _min = Math.min(_min, minimax(child, depth - 1, pMax, !pNow));
+                _min = Math.min(_min, minimax(child, depth - 1, pMax, !pNow, alpha, beta));
+                beta = Math.min(beta, _min);
+                if (beta <= alpha) break;
             }
             return _min;
         }
@@ -151,18 +153,52 @@ public class Main {
 
     private static int value(char[][] node, boolean isLower) {
         int vl = 0;
-        for (char[] row : node) {
-            for (char c : row) {
-                vl += scoreForChar(c, isLower);
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 9; x++) {
+                char c = node[y][x];
+                int charValue = scoreForChar(c);
+                charValue += scoreForIndex(c, x, y);
+                if (isLower(c) == isLower) vl += charValue;
+                else {
+                    if (charValue >= scores.get('v')) {
+                        charValue /= 2;
+                    }
+                    vl -= charValue;
+                }
             }
         }
         return vl;
     }
 
-    private static int scoreForChar(char c, boolean isLower) {
+    private static int scoreForChar(char c) {
         int value = scores.get(Character.toLowerCase(c));
-        if (isLower(c) == isLower) return value;
-        return -value;
+        return value;
+    }
+
+    private static int scoreForIndex(char c, int x, int y) {
+        boolean isLower = isLower(c);
+        if (c == 'X' || c == 'x') {
+            return isLower ? xScore[y][x] : xScore[9-y][x];
+        }
+        if (c == 'M' || c == 'm') {
+            return isLower ? mScore[y][x] : mScore[9-y][x];
+        }
+        if (c == 'T' || c == 't') {
+            return isLower ? tScore[y][x] : tScore[9-y][x];
+        }
+        if (c == 'S' || c == 's') {
+            return isLower ? sScore[y][x] : sScore[9-y][x];
+        }
+        if (c == 'V' || c == 'v') {
+            return isLower ? vScore[y][x] : vScore[9-y][x];
+        }
+        if (c == 'C' || c == 'c') {
+            return isLower ? cScore[y][x] : cScore[9-y][x];
+        }
+        if (c == 'P' || c == 'p') {
+            return isLower ? pScores[y][x] : pScores[9-y][x];
+        }
+        return 0;
     }
 
     public static List<Movement> canGo(char[][] board, int x, int y, boolean isLower) {
@@ -195,15 +231,100 @@ public class Main {
     }
 
     public static void generateScores() {
-        scores.put('x', 7);
-        scores.put('m', 4);
-        scores.put('t', 3);
-        scores.put('s', 2);
-        scores.put('c', 5);
-        scores.put('v', 500);
-        scores.put('p', 1);
+        scores.put('x', 70);
+        scores.put('m', 40);
+        scores.put('t', 25);
+        scores.put('s', 20);
+        scores.put('c', 90);
+        scores.put('v', 500000);
+        scores.put('p', 10);
         scores.put('_', 0);
+
     }
+
+    public static int[][] pScores =
+            {{0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {1,1,1,1,1,1,1,1,1},
+                    {1,1,2,2,2,2,2,2,1},
+                    {1,1,1,2,2,2,1,1,1},
+                    {1,1,1,2,2,2,2,1,1},
+                    {1,1,2,2,2,2,2,2,1},
+                    {1,1,2,2,2,2,2,2,1}};
+
+    public static int[][] mScore =
+            {{-5,-4,-3,-3,-3,-3,-3,-4,-5},
+                    {-4,-2,0,0,0,0,0,-2,-4},
+                    {-3,0,0,3,3,3,0,0,-3},
+                    {-3,0,0,4,4,4,0,0,-3},
+                    {-3,1,1,4,4,4,1,1,-3},
+                    {-3,2,2,3,3,3,2,2,-3},
+                    {-3,3,3,4,4,4,3,3,-3},
+                    {-3,2,2,2,2,2,2,2,-3},
+                    {-4,-2,0,1,1,1,0,-2,-4},
+                    {-5,-4,-3,-3,-3,-3,-3,-4,-5}};
+
+    public static int[][] xScore =
+            {{0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {-1,2,2,2,2,2,2,2,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,1,1,1,1,1,1,1,-1},
+                    {0,1,1,1,1,1,1,1,0}};
+
+    public static int[][] vScore =
+            {{0,0,0,1,1,1,0,0,0},
+                    {0,0,0,0,2,0,0,0,0},
+                    {0,0,0,1,0,1,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0}};
+
+    public static int[][] tScore =
+            {{0,0,1,0,0,0,1,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {-1,0,0,0,2,0,0,0,-1},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0}};
+
+    public static int[][] sScore =
+            {{0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,1,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0}};
+
+    public static int[][] cScore =
+            {{0,0,0,0,0,0,0,0,0},
+                    {0,0,0,0,0,0,0,0,0},
+                    {-1,2,2,2,2,2,2,2,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,0,0,0,0,0,0,0,-1},
+                    {-1,1,1,1,1,1,1,1,-1},
+                    {0,1,1,1,1,1,1,1,0}};
 
     private static List<Movement> pP(int x, int y, char[][] board) {
         List<Movement> list = new ArrayList<>();
@@ -244,9 +365,12 @@ public class Main {
         int stop = 0;
         while (i > 0) {
             i--;
-            if (board[y][i] == '_' && stop == 0) {
-                list.add(new Movement(x, y, i, y));
+            if (board[y][i] == '_') {
+                if (stop == 0) {
+                    list.add(new Movement(x, y, i, y));
+                }
             } else if ((isLower(board[y][x]) != isLower(board[y][i])) && stop == 1) {
+                if (board[y][i] == '_') continue;
                 list.add(new Movement(x, y, i, y));
                 stop++;
             }
@@ -260,9 +384,12 @@ public class Main {
         stop = 0;
         while (i < 8) {
             i++;
-            if (board[y][i] == '_' && stop == 0) {
-                list.add(new Movement(x, y, i, y));
+            if (board[y][i] == '_') {
+                if (stop == 0) {
+                    list.add(new Movement(x, y, i, y));
+                }
             } else if ((isLower(board[y][x]) != isLower(board[y][i])) && stop == 1) {
+                if (board[y][i] == '_') continue;
                 list.add(new Movement(x, y, i, y));
                 stop++;
             }
@@ -276,9 +403,12 @@ public class Main {
         stop = 0;
         while (i < 9) {
             i++;
-            if (board[i][x] == '_' && stop == 0) {
-                list.add(new Movement(x, y, x, i));
+            if (board[i][x] == '_') {
+                if (stop == 0) {
+                    list.add(new Movement(x, y, x, i));
+                }
             } else if ((isLower(board[y][x]) != isLower(board[i][x])) && stop == 1) {
+                if (board[i][x] == '_') continue;
                 list.add(new Movement(x, y, x, i));
                 stop++;
             }
@@ -292,9 +422,12 @@ public class Main {
         stop = 0;
         while (i > 0) {
             i--;
-            if (board[i][x] == '_' && stop == 0) {
-                list.add(new Movement(x, y, x, i));
+            if (board[i][x] == '_') {
+                if (stop == 0) {
+                    list.add(new Movement(x, y, x, i));
+                }
             } else if ((isLower(board[y][x]) != isLower(board[i][x])) && stop == 1) {
+                if (board[i][x] == '_') continue;
                 list.add(new Movement(x, y, x, i));
                 stop++;
             }
@@ -309,17 +442,21 @@ public class Main {
     private static List<Movement> vV(int x, int y, char[][] board) {
         List<Movement> list = new ArrayList<>();
         boolean isLower = isLower(board[y][x]);
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
+        for (int i = -1; i < 2; i+= 2) {
                 int x1 = x + i;
-                int y1 = y + j;
-                if (isInsidePalace(x1, y1, isLower)) {
+                int y1 = y + i;
+                if (isInsidePalace(x1, y, isLower)) {
                     // if in palace and is the enemy then we will add
-                    if (isLower(board[y1][x1]) != isLower || board[y1][x1] == '_') {
-                        list.add(new Movement(x, y, x1, y1));
+                    if (isLower(board[y][x1]) != isLower || board[y][x1] == '_') {
+                        list.add(new Movement(x, y, x1, y));
                     }
                 }
-            }
+                if (isInsidePalace(x, y1, isLower)) {
+                    // if in palace and is the enemy then we will add
+                    if (isLower(board[y1][x]) != isLower || board[y1][x] == '_') {
+                        list.add(new Movement(x, y, x, y1));
+                    }
+                }
         }
         return list;
     }

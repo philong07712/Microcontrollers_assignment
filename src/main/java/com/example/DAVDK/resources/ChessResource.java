@@ -15,12 +15,16 @@ public class ChessResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getAIMove(String boardJson) {
+
         Main.generateScores();
+        System.out.println(boardJson);
         char[][] board = null;
         Movement movement = new Movement();
         try {
             board = StringUtil.convertBoard(boardJson);
-            movement = Main.CPUMiniMaxTurn(board, true, 3);
+            if (Main.isFinish(board)) return Response.status(501).build();
+            System.out.println("Thread: " + Thread.currentThread().getName());
+            movement = Main.CPUMiniMaxTurn(board, true, 4);
             movement.oldPoint.y = 9 - movement.oldPoint.y;
             movement.newPoint.y = 9 - movement.newPoint.y;
         } catch (Exception e) {

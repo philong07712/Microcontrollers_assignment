@@ -92,5 +92,7 @@
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client-jetty:1.30.6" level="project" />
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client-java6:1.30.6" level="project" />
     <orderEntry type="library" name="Maven: com.google.apis:google-api-services-sheets:v4-rev581-1.25.0" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish.jersey.media:jersey-media-multipart:2.25" level="project" />
+    <orderEntry type="library" name="Maven: org.jvnet.mimepull:mimepull:1.9.6" level="project" />
   </component>
 </module>

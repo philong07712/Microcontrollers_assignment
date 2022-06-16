@@ -26,7 +26,6 @@ public class StringUtil {
         char[][] board = new char[10][9];
         JSONObject obj = (JSONObject) JSONValue.parse(json);
         JSONArray rows = (JSONArray) obj.get("board");
-        System.out.println("Before: " + rows.toJSONString());
         for(int row = 0; row < rows.size(); row++) {
             JSONArray cols = (JSONArray) rows.get(row);
             char[] temp = new char[cols.size()];
@@ -35,7 +34,6 @@ public class StringUtil {
             }
             board[row] = temp;
         }
-        System.out.println("After: " + Arrays.deepToString(board));
         return board;
     }
 }
