@@ -161,7 +161,7 @@ public class NewPath {
     public static void updateNodePowerUp(Node[][] nodeList, List<Point> powerUp) {
         int powerTag = 0;
         for (Point p : powerUp) {
-            nodeList[p.x][p.y].tag = 4;
+            nodeList[p.x][p.y].tag = POWER_TAG;
             nodeList[p.x][p.y].powerTag = powerTag++;
             List<Point> contactList = getDiagonalContactList(p);
             for (Point contact : contactList) {
