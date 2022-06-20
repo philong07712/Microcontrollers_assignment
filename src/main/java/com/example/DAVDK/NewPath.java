@@ -79,7 +79,7 @@ public class NewPath {
     public static List<Point> genPath(Node[][] nodeList, Point curPoint, List<Point> curPath) {
         int bestScore = 0;
         Node[][] tempNodeList = cloneNodeList(nodeList);
-        tempNodeList[curPoint.x][curPoint.y].tag = 1;
+        tempNodeList[curPoint.x][curPoint.y].tag = PATH_TAG;
         curPath.add(curPoint);
         List<Point> bestPath = new ArrayList<>(curPath);
         if (curPoint.equals(targetPoint)) {
@@ -117,7 +117,7 @@ public class NewPath {
         int score = 0;
         for (int i = 0; i < path.size(); i++) {
             Point p = path.get(i);
-            if (nodeList[p.x][p.y].tag == 3) {
+            if (nodeList[p.x][p.y].tag == CONTACTED_TAG) {
                 if (p.x == 2 && p.y == 3) {
                 }
                 score += 100;
@@ -149,7 +149,7 @@ public class NewPath {
                 if ((i != 0 && j != 0) || (i == 0 && j == 0)) continue;
                 Point newPoint = new Point(p.x + i, p.y + j);
                 if (isValidPosition(newPoint.x, newPoint.y)) {
-                    if (nodeList[newPoint.x][newPoint.y].tag != 4) {
+                    if (nodeList[newPoint.x][newPoint.y].tag != POWER_TAG) {
                         nextMoveList.add(newPoint);
                     }
                 }
@@ -165,7 +165,7 @@ public class NewPath {
             nodeList[p.x][p.y].powerTag = powerTag++;
             List<Point> contactList = getDiagonalContactList(p);
             for (Point contact : contactList) {
-                nodeList[contact.x][contact.y].tag = 3;
+                nodeList[contact.x][contact.y].tag = CONTACTED_TAG;
 
             }
         }
@@ -202,7 +202,7 @@ public class NewPath {
             List<Point> availableSpots = new ArrayList<>();
             List<Point> contactList = getDiagonalContactList(p);
             for (Point contact : contactList) {
-                if (nodeList[contact.x][contact.y].tag == 0) {
+                if (nodeList[contact.x][contact.y].tag == EMPTY_TAG) {
                     availableSpots.add(contact);
                 }
             }
@@ -217,7 +217,7 @@ public class NewPath {
                         Point checkPoint = new Point(p1.x + i, p1.y + j);
                         if (isValidPosition(checkPoint.x, checkPoint.y)) {
                             Node node = nodeList[checkPoint.x][checkPoint.y];
-                            if ((node.tag == 4) || treeList.contains(p1) || treeList.contains(checkPoint)
+                            if ((node.tag == POWER_TAG) || treeList.contains(p1) || treeList.contains(checkPoint)
                                     || isForkAlreadyHasTree(p1, forkMap)) {
                                 canBuildTree = false;
                             }
@@ -268,7 +268,7 @@ public class NewPath {
         List<Point> availableSpot = new ArrayList<>();
         for (int i = 0; i < nodeList.length; i++) {
             for (int j = 0; j < nodeList[i].length; j++) {
-                if (nodeList[i][j].tag == 0) availableSpot.add(new Point(i, j));
+                if (nodeList[i][j].tag == EMPTY_TAG) availableSpot.add(new Point(i, j));
             }
         }
         int holeLeft = numHole;
@@ -279,10 +279,10 @@ public class NewPath {
             boolean isContactWithPath = false;
             for (Point contactPoint : contactList) {
                 Node node = nodeList[contactPoint.x][contactPoint.y];
-                if (node.tag == 4 || node.tag == 2) {
+                if (node.tag == POWER_TAG || node.tag == TREE_TAG) {
                     ísContactWithBarrier = true;
                 }
-                if (node.tag == 1) isContactWithPath = true;
+                if (node.tag == PATH_TAG) isContactWithPath = true;
             }
             if (!ísContactWithBarrier && isContactWithPath && !holeList.contains(spot)) {
                 holeLeft--;
@@ -340,15 +340,15 @@ public class NewPath {
         updateNodePowerUp(map, genPowerUp(powerUps));
         List<Point> path = genPath(map, new Point(0, 0), new ArrayList<>());
         for (Point p : path) {
-            map[p.x][p.y].tag = 1;
+            map[p.x][p.y].tag = PATH_TAG;
         }
         List<Point> trees = genTree(map, path);
         for (Point p : trees) {
-            map[p.x][p.y].tag = 2;
+            map[p.x][p.y].tag = TREE_TAG;
         }
         List<Point> holes = genHole(map, path);
         for (Point p : holes) {
-            map[p.x][p.y].tag = 8;
+            map[p.x][p.y].tag = HOLE_TAG;
         }
         return map;
     }
@@ -365,7 +365,7 @@ public class NewPath {
         for (int i = 0; i < powerUpAbleMatrix.length; i++) {
             for (int j = 0; j < powerUpAbleMatrix[i].length; j++) {
                 int tag = powerUpAbleMatrix[i][j];
-                if (tag == 1) {
+                if (tag == PATH_TAG) {
                     powerUps.add(new Point(j, i));
                 }
             }
@@ -376,6 +376,14 @@ public class NewPath {
     static int numRows = 5;
     static int numColumns = 7;
     static int numPowerUp = 3;
+
+    static int EMPTY_TAG = 0;
+    static int PATH_TAG = 1;
+    static int TREE_TAG = 2;
+    static int POWER_TAG = 3;
+    static int HOLE_TAG = 4;
+    static int CONTACTED_TAG = 5;
+
     static List<Point> powerUps = new ArrayList<>();
     static Point targetPoint = new Point(numColumns - 1, numRows -1);
     public static void main(String[] args) {
